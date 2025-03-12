@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok Downloader 2025</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f8f8f8;
+      color: #333;
+    }
+    
+    .container {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #fe2c55;
+      text-align: center;
+    }
+    
+    .search-form {
+      display: flex;
+      margin: 20px 0;
+      gap: 10px;
+    }
+    
+    input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    
+    button {
+      background-color: #fe2c55;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: #e62448;
+    }
+    
+    .result {
+      margin-top: 20px;
+      display: none;
+    }
+    
+    .video-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .thumbnail {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 8px;
+    }
+    
+    .download-btn {
+      display: inline-block;
+      background-color: #2e9e5b;
+      color: white;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    .download-btn:hover {
+      background-color: #248a4d;
+    }
+    
+    .error {
+      color: #fe2c55;
+      font-weight: bold;
+      text-align: center;
+      display: none;
+    }
+    
+    .loading {
+      text-align: center;
+      display: none;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: #fe2c55;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>TikTok Downloader 2025</h1>
+    
+    <div class="search-form">
+      <input type="text" id="tiktok-url" placeholder="Paste TikTok URL here..." />
+      <button id="search-btn">Download</button>
+    </div>
+    
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Fetching video...</p>
+    </div>
+    
+    <div class="error" id="error-message">
+      Could not download the video. Please check the URL and try again.
+    </div>
+    
+    <div class="result" id="result">
+      <div class="video-container">
+        <img id="thumbnail" class="thumbnail" src="" alt="Video thumbnail" />
+        <p id="video-desc"></p>
+        <a id="download-link" class="download-btn" href="#" download>Download Video</a>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchBtn = document.getElementById('search-btn');
+      const tiktokUrlInput = document.getElementById('tiktok-url');
+      const result = document.getElementById('result');
+      const errorMessage = document.getElementById('error-message');
+      const loading = document.querySelector('.loading');
+      const thumbnail = document.getElementById('thumbnail');
+      const videoDesc = document.getElementById('video-desc');
+      const downloadLink = document.getElementById('download-link');
+      
+      // API endpoint - replace with your Vercel deployment URL
+      const apiUrl = '/api/tiktok-download';
+      
+      searchBtn.addEventListener('click', async function() {
+        const tiktokUrl = tiktokUrlInput.value.trim();
+        
+        if (!tiktokUrl || !tiktokUrl.includes('tiktok.com')) {
+          errorMessage.textContent = 'Please enter a valid TikTok URL';
+          errorMessage.style.display = 'block';
+          result.style.display = 'none';
+          return;
+        }
+        
+        // Show loading state
+        loading.style.display = 'block';
+        errorMessage.style.display = 'none';
+        result.style.display = 'none';
+        
+        try {
+          const response = await fetch(`${apiUrl}?url=${encodeURIComponent(tiktokUrl)}`);
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to download video');
+          }
+          
+          // Display result
+          thumbnail.src = data.data.cover_url;
+          videoDesc.textContent = data.data.description || 'No description available';
+          downloadLink.href = data.data.download_url;
+          
+          // Show result
+          result.style.display = 'block';
+          errorMessage.style.display = 'none';
+        } catch (error) {
+          console.error('Error downloading video:', error);
+          errorMessage.textContent = error.message || 'Error downloading video';
+          errorMessage.style.display = 'block';
+          result.style.display = 'none';
+        } finally {
+          loading.style.display = 'none';
+        }
+      });
+      
+      // Support Enter key in input
+      tiktokUrlInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          searchBtn.click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
